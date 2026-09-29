@@ -158,7 +158,7 @@ export function AboutView({ navigate }: { navigate: NavigateFn }) {
                     <span className={`inline-flex h-10 w-10 items-center justify-center rounded-xl ${s.live ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
                       <s.icon className="h-5 w-5" aria-hidden="true" />
                     </span>
-                    <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${s.live ? "bg-emerald-50 text-emerald-800 ring-1 ring-emerald-200" : "bg-amber-50 text-amber-800 ring-1 ring-amber-200"}`}>
+                    <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${s.live ? "bg-emerald-50 text-emerald-800 ring-1 ring-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-emerald-500/30" : "bg-amber-50 text-amber-800 ring-1 ring-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:ring-amber-500/30"}`}>
                       {s.live ? "Live now" : "In development"}
                     </span>
                   </div>

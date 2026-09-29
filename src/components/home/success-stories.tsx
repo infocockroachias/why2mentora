@@ -71,7 +71,7 @@ export function SuccessStories() {
                     </span>
                     <div className="min-w-0">
                       <p className="flex items-center gap-1.5 truncate text-sm font-semibold">
-                        <TrendingUp className="h-3.5 w-3.5 shrink-0 text-emerald-700" aria-hidden="true" />
+                        <TrendingUp className="h-3.5 w-3.5 shrink-0 text-emerald-700 dark:text-emerald-400" aria-hidden="true" />
                         {s.result}
                       </p>
                       <p className="mt-0.5 truncate text-xs text-muted-foreground">{s.detail}</p>

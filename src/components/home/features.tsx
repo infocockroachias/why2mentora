@@ -209,7 +209,7 @@ export function Toolbelt() {
                   <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm shadow-primary/20 transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110">
                     <t.icon className="h-5 w-5" aria-hidden="true" />
                   </span>
-                  <Badge className="border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-50" variant="outline">
+                  <Badge className="border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-50 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300 dark:hover:bg-emerald-500/10" variant="outline">
                     Live now
                   </Badge>
                 </div>
@@ -233,7 +233,7 @@ export function Toolbelt() {
                   <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-muted text-muted-foreground">
                     <t.icon className="h-5 w-5" aria-hidden="true" />
                   </span>
-                  <Badge variant="outline" className="border-amber-200 bg-amber-50 text-amber-800">
+                  <Badge variant="outline" className="border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300">
                     In development
                   </Badge>
                 </div>
@@ -300,7 +300,7 @@ export function HowItWorks({ navigate }: { navigate: NavigateFn }) {
                         className={cn(
                           "font-mono text-[10px] tracking-widest",
                           s.tag === "FREE"
-                            ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+                            ? "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300"
                             : "border-gold/40 bg-gold/10 text-gold"
                         )}
                       >

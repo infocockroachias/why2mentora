@@ -15,9 +15,11 @@ import { AuthView } from "@/components/views/auth-view";
 import { LegalView, type LegalDoc } from "@/components/views/legal-view";
 import { MentorView } from "@/components/views/mentor-view";
 import { InstituteView } from "@/components/views/institute-view";
+import { SecondBrainView } from "@/components/views/second-brain-view";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { ArrowRight, Menu, Send } from "lucide-react";
+import { ArrowRight, Brain, Menu, Send } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -29,7 +31,8 @@ export type ViewKey =
   | "auth"
   | "legal"
   | "mentor"
-  | "institute";
+  | "institute"
+  | "secondbrain";
 
 export type NavigateFn = (view: ViewKey, opts?: { anchor?: string; doc?: LegalDoc; mode?: "login" | "signup" }) => void;
 
@@ -107,7 +110,7 @@ export function MentoraApp() {
       const raw = window.location.hash.replace(/^#\/?/, "");
       if (!raw) return;
       const [key, anchor] = raw.split("/");
-      const known: ViewKey[] = ["home", "about", "plans", "auth", "legal", "mentor", "institute"];
+      const known: ViewKey[] = ["home", "about", "plans", "auth", "legal", "mentor", "institute", "secondbrain"];
       if (known.includes(key as ViewKey)) {
         setView(key as ViewKey);
         pendingAnchor.current = anchor ?? null;
@@ -188,6 +191,23 @@ export function MentoraApp() {
           </nav>
 
           <div className="hidden items-center gap-2 lg:flex">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate("secondbrain")}
+              aria-label="Open your Second Brain — saved doubts and drill stats"
+              title="Second Brain — saved doubts & drill stats"
+              className={cn(
+                "relative h-9 w-9 text-muted-foreground hover:bg-secondary hover:text-primary",
+                view === "secondbrain" && "bg-secondary/70 text-primary"
+              )}
+            >
+              <Brain className="h-[18px] w-[18px]" aria-hidden="true" />
+              {view === "secondbrain" && (
+                <span aria-hidden="true" className="absolute -bottom-0.5 right-1.5 h-1.5 w-1.5 rounded-full bg-gold" />
+              )}
+            </Button>
+            <ThemeToggle />
             <Button variant="ghost" onClick={() => navigate("auth", { mode: "login" })}>
               Log in
             </Button>
@@ -229,11 +249,24 @@ export function MentoraApp() {
                     </button>
                   ))}
                   <button
+                    onClick={() => navigate("secondbrain")}
+                    className={cn(
+                      "flex items-center gap-2.5 rounded-lg px-3 py-3 text-left text-[15px] font-medium text-foreground transition-colors hover:bg-secondary",
+                      view === "secondbrain" && "bg-secondary/70 text-primary"
+                    )}
+                  >
+                    <Brain className="h-4 w-4 text-gold" aria-hidden="true" /> Second Brain
+                  </button>
+                  <button
                     onClick={() => navigate("auth", { mode: "login" })}
                     className="rounded-lg px-3 py-3 text-left text-[15px] font-medium text-foreground transition-colors hover:bg-secondary"
                   >
                     Log in
                   </button>
+                  <div className="mt-1 flex items-center justify-between rounded-lg px-3 py-2">
+                    <span className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Appearance</span>
+                    <ThemeToggle />
+                  </div>
                 </nav>
                 <div className="mt-auto pb-6">
                   <Button
@@ -258,6 +291,7 @@ export function MentoraApp() {
         {view === "legal" && <LegalView doc={doc} navigate={navigate} />}
         {view === "mentor" && <MentorView navigate={navigate} />}
         {view === "institute" && <InstituteView navigate={navigate} />}
+        {view === "secondbrain" && <SecondBrainView navigate={navigate} />}
       </div>
 
       {/* ---------------- Footer (sticky bottom) ---------------- */}
@@ -314,6 +348,9 @@ export function MentoraApp() {
               </button>
               <button onClick={() => navigate("about")} className="link-sweep w-fit text-left transition-colors hover:text-gold">
                 About us
+              </button>
+              <button onClick={() => navigate("secondbrain")} className="link-sweep w-fit text-left transition-colors hover:text-gold">
+                Second Brain
               </button>
               <button onClick={() => navigate("mentor")} className="link-sweep w-fit text-left transition-colors hover:text-gold">
                 Become a mentor

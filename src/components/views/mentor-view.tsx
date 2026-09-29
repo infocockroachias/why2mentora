@@ -105,7 +105,7 @@ export function MentorView({ navigate }: { navigate: NavigateFn }) {
         <div className="rounded-3xl border border-border bg-card p-6 shadow-xl shadow-primary/5 sm:p-8">
           {done ? (
             <div className="py-8 text-center">
-              <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200">
+              <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-emerald-500/30">
                 ✓
               </span>
               <h2 className="mt-5 font-display text-2xl font-semibold">Application received</h2>

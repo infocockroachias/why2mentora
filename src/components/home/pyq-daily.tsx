@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { ArrowRight, CheckCircle2, Landmark, RefreshCw, Trophy, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { recordPyqAttempt } from "@/lib/second-brain";
 
 /**
  * PYQ Daily Drill — an original practice-MCQ widget.
@@ -158,6 +159,8 @@ export function PyqDaily() {
     } catch {
       /* ignore */
     }
+    // shared record for the Second Brain dashboard (accuracy + active days)
+    recordPyqAttempt(nextCorrect > correctCount, nextStreak);
   }
 
   function pick(i: number) {
@@ -248,7 +251,7 @@ export function PyqDaily() {
                       "group flex cursor-pointer items-start gap-3 rounded-xl border px-4 py-3 text-sm transition-all duration-200",
                       state === "idle" &&
                         "border-border bg-background hover:border-gold/60 hover:bg-accent/40",
-                      state === "correct" && "border-emerald-500/60 bg-emerald-50",
+                      state === "correct" && "border-emerald-500/60 bg-emerald-50 dark:bg-emerald-500/10",
                       state === "wrong" && "border-destructive/50 bg-destructive/5",
                       state === "muted" && "border-border bg-background opacity-55"
                     )}

@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Bot, CircleCheck, CornerDownRight, Loader2, PhoneCall, Send, Sparkles, User } from "lucide-react";
+import { Bot, Brain, CircleCheck, CornerDownRight, Copy, History, Loader2, PhoneCall, Send, Sparkles, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Reveal } from "@/components/views/reveal";
+import { pushRecentDoubt, getRecentDoubts, saveDoubt } from "@/lib/second-brain";
 
 const EXAMS = ["UPSC CSE", "State PCS", "SSC CGL", "RBI Grade B", "NABARD Grade A"];
 const SUBJECTS = [
@@ -73,8 +74,33 @@ export function DoubtSimulator() {
   const [solvedCount, setSolvedCount] = useState<number | null>(null);
   const [mentorStage, setMentorStage] = useState<"idle" | "finding" | "typing" | "answered">("idle");
   const [mentorNote, setMentorNote] = useState<string>("");
+  const [recent, setRecent] = useState<string[]>([]);
+  const [savedNow, setSavedNow] = useState(false);
+  const [copied, setCopied] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const handoverTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  // "/" anywhere (outside a field) jumps to the doubt box
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      const target = e.target as HTMLElement | null;
+      const typing = target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable);
+      if (e.key === "/" && !typing && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        e.preventDefault();
+        inputRef.current?.focus();
+        inputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  // hydrate recent-doubt chips after mount (localStorage is client-only)
+  useEffect(() => {
+    const t = setTimeout(() => setRecent(getRecentDoubts()), 0);
+    return () => clearTimeout(t);
+  }, []);
 
   function startHandover() {
     if (!answer || mentorStage !== "idle") return;
@@ -108,6 +134,8 @@ export function DoubtSimulator() {
     setMarked(false);
     setMentorStage("idle");
     setMentorNote("");
+    setSavedNow(false);
+    setCopied(false);
     handoverTimers.current.forEach(clearTimeout);
     handoverTimers.current = [];
     const started = Date.now();
@@ -126,6 +154,8 @@ export function DoubtSimulator() {
         const elapsed = Date.now() - started;
         if (elapsed < 900) await new Promise((r) => setTimeout(r, 900 - elapsed));
         setAnswer({ ...data.doubt, seconds });
+        pushRecentDoubt(text);
+        setRecent(getRecentDoubts());
       }
     } catch {
       setError("Network trouble. Check your connection and retry.");
@@ -146,6 +176,29 @@ export function DoubtSimulator() {
       );
     }
     return p;
+  }
+
+  function saveToBrain() {
+    if (!answer || savedNow) return;
+    saveDoubt({
+      question: answer.question,
+      exam: answer.exam,
+      subject: answer.subject,
+      summary: answer.summary,
+      points: answer.points,
+      concept: answer.concept,
+    });
+    setSavedNow(true);
+    window.dispatchEvent(new Event("mentora:brain-updated"));
+  }
+
+  function copyAnswer() {
+    if (!answer || copied) return;
+    const text = [answer.question, "", answer.summary, "", ...answer.points, "", answer.concept].join("\n");
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1600);
+    }).catch(() => undefined);
   }
 
   return (
@@ -205,6 +258,7 @@ export function DoubtSimulator() {
               </label>
               <Textarea
                 id="doubt-input"
+                ref={inputRef}
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
                 onKeyDown={(e) => {
@@ -215,10 +269,32 @@ export function DoubtSimulator() {
                 maxLength={600}
               />
               <div className="mt-1 flex items-center justify-between text-[10px] text-muted-foreground">
-                <span>⌘/Ctrl + Enter to ask</span>
+                <span>⌘/Ctrl + Enter to ask · press / to jump here</span>
                 <span aria-live="polite">{question.length}/600</span>
               </div>
             </div>
+
+            {recent.length > 0 && (
+              <div className="mt-3">
+                <p className="mb-1.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
+                  <History className="h-3 w-3" aria-hidden="true" /> Your recent doubts
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {recent.map((r) => (
+                    <button
+                      key={r}
+                      onClick={() => {
+                        setQuestion(r);
+                        ask(r);
+                      }}
+                      className="max-w-full truncate rounded-full border border-gold/30 bg-gold/5 px-2.5 py-1 text-[11px] text-gold transition-colors hover:bg-gold/15 active:scale-[0.97]"
+                    >
+                      {r.length > 42 ? `${r.slice(0, 42)}…` : r}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="mt-2 flex flex-wrap gap-1.5">
               {SAMPLES.map((s) => (
@@ -351,6 +427,33 @@ export function DoubtSimulator() {
                   >
                     📌 {answer.concept}
                   </p>
+
+                  {/* save + copy actions */}
+                  <div className="msg-in ml-10 mt-3 flex flex-wrap items-center gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={saveToBrain}
+                      disabled={savedNow}
+                      aria-label="Save this answer to your Second Brain"
+                      className={cn(
+                        "h-7 border-emerald-400/40 bg-transparent px-2.5 text-[11px] text-emerald-300 hover:bg-emerald-400/10 hover:text-emerald-200",
+                        savedNow && "border-emerald-400/60 bg-emerald-400/10 text-emerald-200 opacity-90"
+                      )}
+                    >
+                      <Brain className="mr-1 h-3 w-3" aria-hidden="true" />
+                      {savedNow ? "Saved to Second Brain" : "Save to Second Brain"}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={copyAnswer}
+                      className="h-7 border-white/15 bg-transparent px-2.5 text-[11px] text-white/60 hover:bg-white/10 hover:text-white"
+                    >
+                      <Copy className="mr-1 h-3 w-3" aria-hidden="true" />
+                      {copied ? "Copied!" : "Copy answer"}
+                    </Button>
+                  </div>
 
                   {/* mentor handover + mark solved */}
                   <div className="mt-5 border-t border-white/10 pt-4">

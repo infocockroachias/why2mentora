@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type CSSProperties } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Bot, BadgeCheck, CircleCheck, PlayCircle } from "lucide-react";
+import { ArrowRight, Bot, BadgeCheck, CircleCheck, PlayCircle, Target } from "lucide-react";
 import type { NavigateFn } from "@/components/mentora-app";
 import { Reveal } from "@/components/views/reveal";
 
@@ -39,6 +39,59 @@ function LiveClock() {
   );
 }
 
+/** Ticking countdown to the next UPSC CSE Prelims (late May, assumed 25 May 06:00 IST). */
+function nextPrelims(now: Date): Date {
+  // Prelims generally falls late May — anchor on 25 May 00:30 UTC (06:00 IST)
+  let year = now.getUTCFullYear();
+  let target = new Date(Date.UTC(year, 4, 25, 0, 30, 0));
+  if (target.getTime() < now.getTime()) {
+    year += 1;
+    target = new Date(Date.UTC(year, 4, 25, 0, 30, 0));
+  }
+  return target;
+}
+
+function PrelimsCountdown() {
+  const [now, setNow] = useState<Date | null>(null);
+  useEffect(() => {
+    const initial = setTimeout(() => setNow(new Date()), 0);
+    const t = setInterval(() => setNow(new Date()), 1000);
+    return () => {
+      clearTimeout(initial);
+      clearInterval(t);
+    };
+  }, []);
+  if (!now) {
+    return (
+      <span
+        aria-hidden="true"
+        className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3.5 py-1.5 font-mono text-xs tracking-wider text-muted-foreground shadow-sm"
+      >
+        Prelims — d · hh:mm
+      </span>
+    );
+  }
+  const target = nextPrelims(now);
+  const diff = Math.max(0, target.getTime() - now.getTime());
+  const days = Math.floor(diff / 86400000);
+  const hrs = Math.floor((diff % 86400000) / 3600000);
+  const mins = Math.floor((diff % 3600000) / 60000);
+  const secs = Math.floor((diff % 60000) / 1000);
+  const year = target.getUTCFullYear();
+  return (
+    <span
+      aria-label={`Countdown to UPSC CSE Prelims ${year}`}
+      className="inline-flex items-center gap-2 rounded-full border border-gold/35 bg-accent/50 px-3.5 py-1.5 font-mono text-xs tracking-wider text-foreground shadow-sm dark:bg-accent/30"
+    >
+      <Target className="h-3.5 w-3.5 text-gold" aria-hidden="true" />
+      <span className="font-semibold uppercase tracking-[0.14em] text-muted-foreground">Prelims {year}</span>
+      <span className="tabular-nums">
+        {days}d {String(hrs).padStart(2, "0")}:{String(mins).padStart(2, "0")}:{String(secs).padStart(2, "0")}
+      </span>
+    </span>
+  );
+}
+
 const CHIPS = [
   { icon: Bot, label: "AI that answers, humans who care" },
   { icon: CircleCheck, label: "AI help is always free" },
@@ -62,7 +115,7 @@ function HeroCollage() {
           <p className="mt-1.5 text-xs font-medium leading-relaxed text-foreground/80">
             Why does RBI target 4% inflation and not zero?
           </p>
-          <p className="mt-2.5 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-emerald-800 ring-1 ring-emerald-200">
+          <p className="mt-2.5 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-emerald-800 ring-1 ring-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-emerald-500/30">
             answered in 41s
           </p>
         </div>
@@ -75,7 +128,7 @@ function HeroCollage() {
       >
         <div className="rounded-xl border border-border bg-card/90 p-3.5 shadow-[0_22px_50px_-22px_rgba(20,83,45,0.38)] backdrop-blur-sm">
           <div className="flex items-center gap-1.5">
-            <span className="inline-flex h-4 w-4 items-center justify-center rounded bg-emerald-100 text-emerald-800">
+            <span className="inline-flex h-4 w-4 items-center justify-center rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300">
               <Bot className="h-2.5 w-2.5" />
             </span>
             <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Mentora · free</p>
@@ -133,7 +186,10 @@ export function Hero({ navigate }: { navigate: NavigateFn }) {
         </Reveal>
 
         <Reveal className="mt-9" delay={90}>
-          <LiveClock />
+          <div className="flex flex-wrap items-center justify-center gap-2.5">
+            <LiveClock />
+            <PrelimsCountdown />
+          </div>
         </Reveal>
 
         <Reveal className="mt-6" delay={150}>
@@ -176,7 +232,7 @@ export function Hero({ navigate }: { navigate: NavigateFn }) {
             {CHIPS.map((c) => (
               <li
                 key={c.label}
-                className="inline-flex items-center gap-2 rounded-full border border-secondary bg-secondary/70 px-4 py-2 text-xs font-semibold text-primary shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]"
+                className="inline-flex items-center gap-2 rounded-full border border-secondary bg-secondary/70 px-4 py-2 text-xs font-semibold text-primary shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
               >
                 <c.icon className="h-3.5 w-3.5 text-gold" aria-hidden="true" />
                 {c.label}

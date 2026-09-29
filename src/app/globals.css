@@ -445,6 +445,58 @@
   background: #14532d;
 }
 
+/* ---------- Dark-mode adjustments for light-tuned utilities ---------- */
+
+.dark .paper-grain {
+  background-image: radial-gradient(#ffffff0e 1px, transparent 1px);
+}
+
+.dark .hero-grid-lines {
+  background-image:
+    linear-gradient(to right, #ffffff10 1px, transparent 1px),
+    linear-gradient(to bottom, #ffffff10 1px, transparent 1px);
+}
+
+.dark .hero-aurora {
+  background:
+    radial-gradient(42rem 24rem at 16% -10%, rgba(233, 162, 59, 0.13), transparent 62%),
+    radial-gradient(52rem 28rem at 88% -6%, rgba(111, 191, 143, 0.11), transparent 64%),
+    radial-gradient(30rem 20rem at 50% 4%, rgba(233, 162, 59, 0.06), transparent 70%);
+}
+
+.dark .card-sheen::before {
+  background: linear-gradient(90deg, transparent, rgba(111, 191, 143, 0.28), rgba(233, 162, 59, 0.34), transparent);
+}
+
+.dark .plan-featured {
+  background:
+    radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1.5px) padding-box,
+    linear-gradient(#12211a, #12211a) padding-box,
+    linear-gradient(155deg, rgba(233, 162, 59, 0.65) 0%, rgba(111, 191, 143, 0.40) 45%, rgba(233, 162, 59, 0.14) 100%) border-box;
+  box-shadow: 0 26px 60px -26px rgba(0, 0, 0, 0.65);
+}
+
+.dark ::selection {
+  background: #e9a23b;
+  color: #0d1710;
+}
+
+.dark .card-lift:hover {
+  box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.6);
+}
+
+/* Custom scrollbar (dark variant) */
+.dark ::-webkit-scrollbar-track {
+  background: #0d1710;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #2c4033;
+  border-color: #0d1710;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #4c8a5f;
+}
+
 /* Scroll reveal base state (activated in JS) */
 .reveal {
   opacity: 0;

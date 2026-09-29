@@ -165,7 +165,7 @@ export function PlansView({ navigate }: { navigate: NavigateFn }) {
                 <ul className="mt-6 flex flex-1 flex-col gap-2.5">
                   {p.features.map((f) => (
                     <li key={f} className="flex items-start gap-2.5 text-sm text-muted-foreground">
-                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700 dark:text-emerald-400" aria-hidden="true" />
                       {f}
                     </li>
                   ))}
@@ -228,7 +228,7 @@ export function PlansView({ navigate }: { navigate: NavigateFn }) {
                 <ul className="mt-6 flex flex-1 flex-col gap-2.5">
                   {p.features.map((f) => (
                     <li key={f} className="flex items-start gap-2.5 text-sm text-muted-foreground">
-                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700 dark:text-emerald-400" aria-hidden="true" />
                       {f}
                     </li>
                   ))}

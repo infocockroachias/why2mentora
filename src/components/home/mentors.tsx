@@ -1,12 +1,31 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BadgeCheck, ArrowRight, Quote } from "lucide-react";
 import type { NavigateFn } from "@/components/mentora-app";
 import { cn } from "@/lib/utils";
 import { Reveal } from "@/components/views/reveal";
+
+/** Counts 0 → target with an ease-out once `active` flips true. */
+function useCountUp(target: number, active: boolean, duration = 1400) {
+  const [value, setValue] = useState(0);
+  useEffect(() => {
+    if (!active) return;
+    let raf = 0;
+    const start = performance.now();
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - start) / duration);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setValue(Math.round(target * eased));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, active, duration]);
+  return active ? value : 0;
+}
 
 /* ---------------- Verified mentors ---------------- */
 
@@ -77,7 +96,7 @@ export function Mentors() {
                   >
                     {m.initials}
                   </span>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-800 ring-1 ring-emerald-200">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-800 ring-1 ring-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-emerald-500/30">
                     <BadgeCheck className="h-3 w-3" aria-hidden="true" /> Verified
                   </span>
                 </div>
@@ -104,6 +123,8 @@ function fmt(n: number) {
 export function StatsBand() {
   const [stats, setStats] = useState<Stat[] | null>(null);
   const [failed, setFailed] = useState(false);
+  const bandRef = useRef<HTMLElement | null>(null);
+  const [inView, setInView] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -119,19 +140,31 @@ export function StatsBand() {
     };
   }, []);
 
+  // start count-up when the band scrolls into view
+  useEffect(() => {
+    const el = bandRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setInView(true);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.35 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   const skeletons = [0, 1, 2, 3];
 
   return (
-    <section aria-label="Platform statistics" className="relative border-y border-border bg-gradient-to-b from-card via-card to-secondary/40">
+    <section ref={bandRef} aria-label="Platform statistics" className="relative border-y border-border bg-gradient-to-b from-card via-card to-secondary/40">
       <div className="mx-auto grid w-full max-w-7xl grid-cols-2 gap-y-8 px-4 py-10 sm:px-6 lg:grid-cols-4 lg:divide-x lg:divide-border lg:px-8">
         {stats
           ? stats.map((s) => (
-              <div key={s.key} className="text-center">
-                <p className="font-display text-3xl font-bold tabular-nums tracking-tight text-primary sm:text-4xl">{fmt(s.value)}+</p>
-                <p className="mt-1 text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                  {s.label}
-                </p>
-              </div>
+              <StatCell key={s.key} stat={s} active={inView} />
             ))
           : !failed
             ? skeletons.map((i) => (
@@ -143,6 +176,23 @@ export function StatsBand() {
             : null}
       </div>
     </section>
+  );
+}
+
+function StatCell({ stat, active }: { stat: Stat; active: boolean }) {
+  const v = useCountUp(stat.value, active);
+  const done = v >= stat.value;
+  return (
+    <div className="text-center">
+      <p
+        className="font-display text-3xl font-bold tabular-nums tracking-tight text-primary transition-colors duration-500 sm:text-4xl"
+        aria-label={`${fmt(stat.value)}+ ${stat.label}`}
+      >
+        {fmt(done ? stat.value : v)}
+        <span className={cn("text-gold transition-opacity duration-500", done ? "opacity-100" : "opacity-40")}>+</span>
+      </p>
+      <p className="mt-1 text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">{stat.label}</p>
+    </div>
   );
 }
 
