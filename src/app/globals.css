@@ -1,0 +1,488 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sora);
+  --font-display: var(--font-fraunces);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-gold: var(--gold);
+  --color-gold-foreground: var(--gold-foreground);
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+  --color-pine: var(--pine);
+  --color-pine-soft: var(--pine-soft);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --radius: 0.75rem;
+
+  /* MENTORA IAS — original brand palette: pine green + saffron gold on warm ivory */
+  --background: #faf7f0;          /* warm ivory paper */
+  --foreground: #17251d;          /* deep pine ink */
+  --card: #ffffff;
+  --card-foreground: #17251d;
+  --popover: #ffffff;
+  --popover-foreground: #17251d;
+  --primary: #14532d;             /* pine 800 */
+  --primary-foreground: #f3f8f1;
+  --secondary: #e8f0e6;           /* pale sage */
+  --secondary-foreground: #14532d;
+  --muted: #f0ece1;               /* warm stone */
+  --muted-foreground: #5c6b60;
+  --accent: #f5e9d3;              /* soft cream gold */
+  --accent-foreground: #7c4a03;
+  --gold: #d97706;                /* saffron gold accent */
+  --gold-foreground: #fff8ec;
+  --ink: #17251d;
+  --paper: #faf7f0;
+  --pine: #14532d;
+  --pine-soft: #1d6b3c;
+  --destructive: #b3261e;
+  --border: #e2ddcf;
+  --input: #d8d2c2;
+  --ring: #d97706;               /* saffron gold focus rings everywhere */
+  --chart-1: #14532d;
+  --chart-2: #d97706;
+  --chart-3: #7c6f5a;
+  --chart-4: #4c8a5f;
+  --chart-5: #a3b18a;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #17251d;
+  --sidebar-primary: #14532d;
+  --sidebar-primary-foreground: #f3f8f1;
+  --sidebar-accent: #e8f0e6;
+  --sidebar-accent-foreground: #14532d;
+  --sidebar-border: #e2ddcf;
+  --sidebar-ring: #14532d;
+}
+
+.dark {
+  --background: #0d1710;
+  --foreground: #edf3ea;
+  --card: #12211a;
+  --card-foreground: #edf3ea;
+  --popover: #12211a;
+  --popover-foreground: #edf3ea;
+  --primary: #6fbf8f;
+  --primary-foreground: #0d1710;
+  --secondary: #1a2d22;
+  --secondary-foreground: #cfe4d2;
+  --muted: #16241c;
+  --muted-foreground: #93a89a;
+  --accent: #2a2416;
+  --accent-foreground: #eab75f;
+  --gold: #e9a23b;
+  --gold-foreground: #0d1710;
+  --ink: #edf3ea;
+  --paper: #0d1710;
+  --pine: #6fbf8f;
+  --pine-soft: #4c8a5f;
+  --destructive: #e5645c;
+  --border: #24352b;
+  --input: #2c4033;
+  --ring: #e9a23b;
+  --chart-1: #6fbf8f;
+  --chart-2: #e9a23b;
+  --chart-3: #93a89a;
+  --chart-4: #4c8a5f;
+  --chart-5: #a3b18a;
+  --sidebar: #12211a;
+  --sidebar-foreground: #edf3ea;
+  --sidebar-primary: #6fbf8f;
+  --sidebar-primary-foreground: #0d1710;
+  --sidebar-accent: #1a2d22;
+  --sidebar-accent-foreground: #cfe4d2;
+  --sidebar-border: #24352b;
+  --sidebar-ring: #6fbf8f;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-gold/60;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "ss01", "cv11";
+  }
+  /* Quiet default transitions so every interactive element feels finished */
+  a,
+  button,
+  [role="button"],
+  [role="tab"],
+  summary,
+  input,
+  select,
+  textarea {
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform;
+    transition-duration: 220ms;
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  ::selection {
+    background: #d97706;
+    color: #fff8ec;
+  }
+}
+
+/* ---------- MENTORA brand utilities ---------- */
+
+.font-display {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-optical-sizing: auto;
+  font-variation-settings: "SOFT" 40, "WONK" 0;
+}
+
+/* Fractions of light — layered radial glow for the hero */
+.hero-aurora {
+  background:
+    radial-gradient(42rem 24rem at 16% -10%, rgba(217, 119, 6, 0.11), transparent 62%),
+    radial-gradient(52rem 28rem at 88% -6%, rgba(20, 83, 45, 0.10), transparent 64%),
+    radial-gradient(30rem 20rem at 50% 4%, rgba(217, 119, 6, 0.06), transparent 70%);
+}
+
+/* Fine film grain (inline SVG turbulence) — layer at 3-5% opacity */
+.grain-fine {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+/* Letter tiles — gold top hairline + deeper lift on hover */
+.letter-tile {
+  position: relative;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.letter-tile::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 14%;
+  right: 14%;
+  height: 2px;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, transparent, rgba(217, 119, 6, 0.85), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.letter-tile:hover::before {
+  opacity: 1;
+}
+.letter-tile:hover {
+  transform: translateY(-4px);
+  border-color: rgba(217, 119, 6, 0.45);
+  box-shadow: 0 14px 30px -14px rgba(20, 83, 45, 0.35), 0 0 0 1px rgba(217, 119, 6, 0.12);
+}
+
+/* Hand-drawn underline stroke draws itself in */
+@keyframes underline-draw {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+.hero-underline path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: underline-draw 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.55s forwards;
+}
+
+/* Specular sweep for primary buttons */
+.btn-sheen {
+  position: relative;
+  overflow: hidden;
+}
+.btn-sheen::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -45%;
+  width: 38%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.30), transparent);
+  transform: skewX(-18deg);
+  transition: left 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+.btn-sheen:hover::after {
+  left: 125%;
+}
+
+/* Soft top-edge highlight for cards on ivory */
+.card-sheen {
+  position: relative;
+}
+.card-sheen::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 14%;
+  right: 14%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(20, 83, 45, 0.20), rgba(217, 119, 6, 0.30), transparent);
+  opacity: 0.55;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+.card-sheen:hover::before {
+  opacity: 1;
+}
+
+/* Night panel — inner glow for dark answer/chat surfaces */
+.panel-night {
+  background:
+    radial-gradient(120% 55% at 50% -8%, rgba(111, 191, 143, 0.09), transparent 60%),
+    radial-gradient(80% 50% at 100% 112%, rgba(217, 119, 6, 0.07), transparent 60%),
+    #0d1710;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 30px 70px -30px rgba(13, 23, 16, 0.55);
+}
+
+/* Gradient border ring for featured plan cards */
+.plan-featured {
+  border: 1px solid transparent;
+  background:
+    radial-gradient(rgba(20, 83, 45, 0.05) 1px, transparent 1.5px) padding-box,
+    linear-gradient(#ffffff, #ffffff) padding-box,
+    linear-gradient(155deg, rgba(217, 119, 6, 0.70) 0%, rgba(20, 83, 45, 0.45) 45%, rgba(217, 119, 6, 0.15) 100%) border-box;
+  background-size: 16px 16px, auto, auto;
+  box-shadow: 0 26px 60px -26px rgba(20, 83, 45, 0.30);
+}
+
+/* Slim dark scrollbar for answer panels */
+.scroll-dark {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
+}
+.scroll-dark::-webkit-scrollbar {
+  width: 8px;
+}
+.scroll-dark::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scroll-dark::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.16);
+  border: none;
+  border-radius: 8px;
+}
+.scroll-dark::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.32);
+}
+
+/* Gentle tilt-aware float for collage cards */
+@keyframes mentora-float-tilt {
+  0%, 100% { transform: translateY(0) rotate(var(--tilt, 0deg)); }
+  50% { transform: translateY(-9px) rotate(var(--tilt, 0deg)); }
+}
+.float-tilt {
+  animation: mentora-float-tilt 7s ease-in-out infinite;
+}
+
+.paper-grain {
+  background-image: radial-gradient(#14532d08 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+.grain-dark {
+  background-image: radial-gradient(#ffffff0a 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+.hero-grid-lines {
+  background-image:
+    linear-gradient(to right, #14532d0d 1px, transparent 1px),
+    linear-gradient(to bottom, #14532d0d 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 90% 80% at 50% 20%, black 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 20%, black 40%, transparent 100%);
+}
+
+/* Marquee ticker for exam verticals */
+@keyframes mentora-ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.ticker-track {
+  animation: mentora-ticker 32s linear infinite;
+}
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+
+/* Soft float for badges */
+@keyframes mentora-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.float-slow {
+  animation: mentora-float 6s ease-in-out infinite;
+}
+
+/* Pulse ring for live indicators */
+@keyframes live-ping {
+  0% { transform: scale(1); opacity: 0.7; }
+  80%, 100% { transform: scale(2.2); opacity: 0; }
+}
+.live-ping::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: currentColor;
+  animation: live-ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Chat message entrance */
+@keyframes msg-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.msg-in {
+  animation: msg-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Blinking cursor */
+@keyframes caret-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.caret-blink {
+  animation: caret-blink 1s step-end infinite;
+}
+
+/* Shimmer for skeleton/ai thinking */
+@keyframes shimmer {
+  0% { background-position: -480px 0; }
+  100% { background-position: 480px 0; }
+}
+.shimmer {
+  background-image: linear-gradient(90deg, transparent, rgba(217, 119, 6, 0.32), transparent);
+  background-size: 480px 100%;
+  background-repeat: no-repeat;
+  animation: shimmer 1.8s infinite linear;
+}
+
+/* Underline sweep for nav links */
+.link-sweep {
+  position: relative;
+}
+.link-sweep::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  height: 2px;
+  width: 100%;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.link-sweep:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* Card lift */
+.card-lift {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+}
+.card-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px -18px #14532d33;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #f0ece1;
+}
+::-webkit-scrollbar-thumb {
+  background: #c9c2ae;
+  border-radius: 8px;
+  border: 2px solid #f0ece1;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #14532d;
+}
+
+/* Scroll reveal base state (activated in JS) */
+.reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Vertical text for acronym rail */
+.acronym-letter {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-variation-settings: "SOFT" 80, "WONK" 1, "opsz" 144;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track, .float-slow, .float-tilt, .live-ping::after {
+    animation: none;
+  }
+  .float-tilt {
+    transform: rotate(var(--tilt, 0deg));
+  }
+  .hero-underline path {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+  .btn-sheen::after {
+    display: none;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}

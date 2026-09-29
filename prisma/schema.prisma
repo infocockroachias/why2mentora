@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  role         String   @default("student") // student | mentor | institute
+  exam         String?  // UPSC CSE | State PCS | SSC | RBI Grade B | NABARD Grade A
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  doubts       Doubt[]
+}
+
+model Doubt {
+  id         String   @id @default(cuid())
+  studentId  String?
+  student    User?    @relation(fields: [studentId], references: [id])
+  email      String?
+  exam       String   @default("UPSC CSE")
+  subject    String   @default("Polity")
+  question   String
+  aiSummary  String?
+  aiPoints   String?  // JSON array of structured explanation points
+  aiConcept  String?  // prerequisite concept the asker may be missing
+  status     String   @default("ai_answered") // ai_answered | mentor_assigned | solved | unsolved
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model InstituteInquiry {
+  id           String   @id @default(cuid())
+  institute    String
+  contactName  String
+  email        String
+  phone        String?
+  city         String?
+  students     String   @default("1-100")
+  message      String?
+  createdAt    DateTime @default(now())
+}
+
+model MentorApplication {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  phone       String?
+  exam        String   // vertical they mentor for
+  credential  String   // rank / service / teaching experience
+  subjects    String   // comma separated
+  bio         String?
+  createdAt   DateTime @default(now())
+}
+
+model Subscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
+
+model PlatformStat {
+  id    String @id @default(cuid())
+  key   String @unique
+  label String
+  value Int
+}
