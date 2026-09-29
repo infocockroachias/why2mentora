@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ArrowRight, Building2, Check, GraduationCap, Sparkles } from "lucide-react";
 import type { NavigateFn } from "@/components/mentora-app";
 import { cn } from "@/lib/utils";
@@ -247,6 +248,57 @@ export function PlansView({ navigate }: { navigate: NavigateFn }) {
           </div>
         </div>
       </section>
+
+      {/* FAQ */}
+      <section aria-labelledby="faq-heading" className="py-14 sm:py-16">
+        <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
+          <h2 id="faq-heading" className="text-center font-display text-3xl font-semibold tracking-tight">
+            Questions about plans, answered
+          </h2>
+          <Accordion type="single" collapsible className="mt-9 flex flex-col gap-3">
+            {FAQS.map((f) => (
+              <AccordionItem
+                key={f.q}
+                value={f.q}
+                className="rounded-2xl border border-border bg-card px-5 last:border-b"
+              >
+                <AccordionTrigger className="py-4 text-left text-[15px] font-semibold hover:no-underline [&>svg]:text-gold">
+                  {f.q}
+                </AccordionTrigger>
+                <AccordionContent className="pb-5 text-sm leading-relaxed text-muted-foreground">
+                  {f.a}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+          <p className="mt-6 text-center text-xs text-muted-foreground">
+            Still unsure? The Seeker plan is free forever — upgrade only when the doubt load says so.
+          </p>
+        </div>
+      </section>
     </main>
   );
 }
+
+const FAQS = [
+  {
+    q: "Is the AI really free forever on every plan?",
+    a: "Yes. AI explanations are unlimited and free on Seeker, Achiever and Rank Holder alike — including the doubt simulator on the home page. Paid tiers exist purely for human attention: faster mentor routing, richer formats (voice and video) and more monthly calls.",
+  },
+  {
+    q: "What exactly happens when I 'mark a doubt solved'?",
+    a: "A mentor credit is consumed only at that moment — not when the doubt is routed, and not while you decide. If no mentor picked up your doubt within the promised window, any routing credit already returns to your balance automatically.",
+  },
+  {
+    q: "Can I switch between monthly and yearly?",
+    a: "Any time, from account settings. Yearly billing saves about 30%, and the unused remainder of a monthly cycle carries forward as credit on your yearly plan.",
+  },
+  {
+    q: "How are mentors verified before they answer?",
+    a: "Credential checks (rank, service or teaching record), a supervised mock doubt session, and reference verification. Inside sessions, students stay pseudonymous and contact-detail exchange is filtered — for both sides.",
+  },
+  {
+    q: "Do institute plans replace our own faculty?",
+    a: "No — they amplify it. Your mentors' published hours are always tried first; only when nobody is free does the doubt flow to the shared MENTORA bench, so no student waits overnight for an answer.",
+  },
+];

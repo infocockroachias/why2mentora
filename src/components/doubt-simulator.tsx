@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Bot, CircleCheck, CornerDownRight, Loader2, Send, Sparkles, User } from "lucide-react";
+import { Bot, CircleCheck, CornerDownRight, Loader2, PhoneCall, Send, Sparkles, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Reveal } from "@/components/views/reveal";
 
@@ -39,6 +39,29 @@ const SAMPLES = [
   "Difference between continental shelf and exclusive economic zone?",
 ];
 
+/** Pseudonymous mentor personas + exam-strategy replies (original writing). */
+const MENTORS = [
+  { initials: "AS", tint: "bg-emerald-800", tag: "Rank 47, UPSC CSE · Polity, History" },
+  { initials: "MD", tint: "bg-amber-700", tag: "State PCS topper · Polity, Economy" },
+  { initials: "RK", tint: "bg-teal-800", tag: "RBI Grade B · ESI, Finance" },
+];
+
+function mentorReply(subject: string): string {
+  if (/economy|rbi|finance|budget|inflation/i.test(subject)) {
+    return `Good question — and the AI summary is right. My exam-lens: in Prelims, this is asked as a statement-pair, so memorise the numbers (the 4% midpoint, the ±2% band, the year it took effect) — not just the idea. In Mains, one committee citation and one recent MPC decision makes the answer top-quartile. Do this now: re-derive the whole thing from memory on one page. If you can teach it to a blank sheet, it's yours.`;
+  }
+  if (/history|culture/i.test(subject)) {
+    return `Yes — the AI breakdown covers the provision. What I'd add from experience: examiners frame this as "which of the following is/are correct", so convert the summary into 3 flashcard statements today. Anchor it to one timeline hook and one personality — recall needs handles, not paragraphs. And attempt one PYQ on it within 48 hours; retrieval beats re-reading every time.`;
+  }
+  return `The AI answer is solid — here's how I'd finish it in the exam hall. Structure: one line stating the provision, two lines on the mechanism, one line on the precedent, one on current relevance. That's four sentences and full marks' architecture. The trap they'll set: a near-identical option swapping "may" with "shall", or moving a power between the two houses. Underline the verb in every option before you pick. Revise this topic again after three days — spaced, not crammed.`;
+}
+
+function pickMentor(subject: string) {
+  if (/economy|rbi|finance/i.test(subject)) return MENTORS[2];
+  if (/history|culture/i.test(subject)) return MENTORS[1];
+  return MENTORS[0];
+}
+
 export function DoubtSimulator() {
   const [exam, setExam] = useState(EXAMS[0]);
   const [subject, setSubject] = useState(SUBJECTS[0]);
@@ -48,7 +71,22 @@ export function DoubtSimulator() {
   const [error, setError] = useState<string | null>(null);
   const [marked, setMarked] = useState(false);
   const [solvedCount, setSolvedCount] = useState<number | null>(null);
+  const [mentorStage, setMentorStage] = useState<"idle" | "finding" | "typing" | "answered">("idle");
+  const [mentorNote, setMentorNote] = useState<string>("");
   const panelRef = useRef<HTMLDivElement>(null);
+  const handoverTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  function startHandover() {
+    if (!answer || mentorStage !== "idle") return;
+    setMentorStage("finding");
+    const t1 = setTimeout(() => setMentorStage("typing"), 1400);
+    const t2 = setTimeout(() => {
+      setMentorNote(mentorReply(answer.subject));
+      setMentorStage("answered");
+    }, 4200);
+    // store timers for cleanup on re-ask
+    handoverTimers.current = [t1, t2];
+  }
 
   // fetch recent counters for the strip under the panel
   useEffect(() => {
@@ -68,6 +106,10 @@ export function DoubtSimulator() {
     setLoading(true);
     setAnswer(null);
     setMarked(false);
+    setMentorStage("idle");
+    setMentorNote("");
+    handoverTimers.current.forEach(clearTimeout);
+    handoverTimers.current = [];
     const started = Date.now();
     try {
       const res = await fetch("/api/doubt", {
@@ -310,25 +352,98 @@ export function DoubtSimulator() {
                     📌 {answer.concept}
                   </p>
 
-                  {/* mark solved */}
-                  <div className="mt-5 flex items-center gap-3 border-t border-white/10 pt-4">
-                    {marked ? (
-                      <Badge className="gap-1.5 bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/15">
-                        <CircleCheck className="h-3.5 w-3.5" aria-hidden="true" /> Marked solved — ₹0 charged
-                      </Badge>
-                    ) : (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setMarked(true)}
-                        className="border-emerald-400/40 bg-transparent text-emerald-300 hover:bg-emerald-400/10 hover:text-emerald-200"
-                      >
-                        <CircleCheck className="mr-1.5 h-4 w-4" aria-hidden="true" /> Mark as solved
-                      </Button>
+                  {/* mentor handover + mark solved */}
+                  <div className="mt-5 border-t border-white/10 pt-4">
+                    {mentorStage !== "answered" && (
+                      <div className="flex flex-wrap items-center gap-3">
+                        {marked ? (
+                          <Badge className="gap-1.5 bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/15">
+                            <CircleCheck className="h-3.5 w-3.5" aria-hidden="true" /> Marked solved — ₹0 charged
+                          </Badge>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setMarked(true)}
+                            className="border-emerald-400/40 bg-transparent text-emerald-300 hover:bg-emerald-400/10 hover:text-emerald-200"
+                          >
+                            <CircleCheck className="mr-1.5 h-4 w-4" aria-hidden="true" /> Mark as solved
+                          </Button>
+                        )}
+                        {mentorStage === "idle" ? (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={startHandover}
+                            className="border-gold/40 bg-transparent text-gold hover:bg-gold/10 hover:text-gold"
+                          >
+                            <PhoneCall className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" /> Still stuck? Bring in a mentor
+                          </Button>
+                        ) : (
+                          <span className="inline-flex items-center gap-2 text-[11px] text-white/50">
+                            {mentorStage === "finding" ? (
+                              <>
+                                <Loader2 className="h-3.5 w-3.5 animate-spin text-gold" aria-hidden="true" /> Routing to a verified mentor…
+                              </>
+                            ) : (
+                              <>
+                                <span className="flex gap-1" aria-label="Mentor is typing">
+                                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white/50 [animation-delay:0ms]" />
+                                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white/50 [animation-delay:150ms]" />
+                                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white/50 [animation-delay:300ms]" />
+                                </span>
+                                mentor typing…
+                              </>
+                            )}
+                          </span>
+                        )}
+                      </div>
                     )}
-                    <span className="text-[11px] text-white/40">
-                      A mentor handover would appear here in the full app.
-                    </span>
+
+                    {mentorStage === "answered" && (() => {
+                      const m = pickMentor(answer.subject);
+                      return (
+                        <div className="msg-in flex items-start gap-2.5">
+                          <span
+                            className={cn(
+                              "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-display text-[11px] font-bold text-white",
+                              m.tint
+                            )}
+                            aria-hidden="true"
+                          >
+                            {m.initials}
+                          </span>
+                          <div className="flex-1 rounded-xl rounded-tl-sm border border-emerald-400/25 bg-emerald-400/5 px-3.5 py-3">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <p className="text-[11px] font-bold uppercase tracking-wider text-emerald-300">
+                                Verified MENTORA mentor
+                              </p>
+                              <span className="rounded-full bg-white/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-white/60">
+                                {m.tag}
+                              </span>
+                            </div>
+                            <p className="mt-2 text-xs leading-relaxed text-white/85">{mentorNote}</p>
+                            <div className="mt-3 flex flex-wrap items-center gap-2.5 border-t border-white/10 pt-2.5">
+                              <span className="text-[10px] text-white/40">Session note kept · student stays pseudonymous</span>
+                              {marked ? (
+                                <Badge className="gap-1.5 bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/15">
+                                  <CircleCheck className="h-3 w-3" aria-hidden="true" /> Marked solved — credit used
+                                </Badge>
+                              ) : (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => setMarked(true)}
+                                  className="h-7 border-emerald-400/40 bg-transparent px-2.5 text-[11px] text-emerald-300 hover:bg-emerald-400/10 hover:text-emerald-200"
+                                >
+                                  <CircleCheck className="mr-1 h-3 w-3" aria-hidden="true" /> Mark as solved
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
               )}

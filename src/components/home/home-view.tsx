@@ -6,6 +6,8 @@ import { Story } from "@/components/home/story";
 import { Pillars, Toolbelt, HowItWorks } from "@/components/home/features";
 import { Mentors, StatsBand, DoubtTeaser } from "@/components/home/mentors";
 import { DoubtSimulator } from "@/components/doubt-simulator";
+import { PyqDaily } from "@/components/home/pyq-daily";
+import { SuccessStories } from "@/components/home/success-stories";
 
 export function HomeView({ navigate }: { navigate: NavigateFn }) {
   return (
@@ -14,10 +16,12 @@ export function HomeView({ navigate }: { navigate: NavigateFn }) {
       <StatsBand />
       <Story />
       <Pillars navigate={navigate} />
+      <PyqDaily />
       <Toolbelt />
       <HowItWorks navigate={navigate} />
       <DoubtSimulator />
       <Mentors />
+      <SuccessStories />
       <DoubtTeaser navigate={navigate} />
     </main>
   );

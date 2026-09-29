@@ -505,6 +505,38 @@ function csatSolvePath(q: string): string {
 
 /* ------------------------------ topic builders ----------------------------- */
 
+/** Question-aware revision hint for polity sub-topics (falls back to Part III map). */
+function polityConceptRef(q: string): string {
+  if (/money bill|financial bill|art(icle)?\.? ?110|passed by (the )?rajya/i.test(q)) {
+    return "Revise: the money-bill track — Article 110 definition, Article 109 assent mechanics, and the Speaker's certification role — against Ordinary and Financial Bills.";
+  }
+  if (/amend|amendment|basic structure|art(icle)?\.? ?368/i.test(q)) {
+    return "Revise: Article 368 procedure (special majority, federal ratification) plus the basic-structure line of cases from Kesavananda Bharati (1973) onward.";
+  }
+  if (/emergency|352|356|360|president'?s rule/i.test(q)) {
+    return "Revise: the three emergencies side by side — Articles 352, 356 and 360 — with grounds, approvals, durations and the 44th Amendment safeguards.";
+  }
+  if (/writ|certiorari|habeas|mandamus|fundamental right|art(icle)?\.? (32|21|19|14|226)/i.test(q)) {
+    return "Revise: Fundamental Rights (Part III) with an article-to-right map, the DPSP–FR relationship, and the five writ types under Articles 32 and 226.";
+  }
+  if (/panchayat|municipal|local government|73rd|74th/i.test(q)) {
+    return "Revise: the 73rd and 74th Amendments — the Eleventh and Twelfth Schedules, State Election and Finance Commissions, and the compulsory-versus-voluntary provisions.";
+  }
+  if (/parliament|lok sabha|rajya sabha|joint sitting|session|prorogation/i.test(q)) {
+    return "Revise: parliamentary procedure basics — sessions, question hour, motions, the joint-sitting rule under Article 108 and where it does not apply.";
+  }
+  if (/president|governor|ordinance|pardon/i.test(q)) {
+    return "Revise: the executive articles — election, term and impeachment of the President, ordinance power under Articles 123 and 213, and the pardon jurisdiction under Article 72.";
+  }
+  if (/election|commission|eci|voting/i.test(q)) {
+    return "Revise: the Election Commission's composition, powers under Articles 324–329, and the Representation of the People Acts of 1950 and 1951.";
+  }
+  if (/federal|centre.state|union list|concurrent|seventh schedule/i.test(q)) {
+    return "Revise: legislative relations — the Seventh Schedule lists, residuary power under Article 248, and doctrines of pith and substance plus colourable legislation.";
+  }
+  return "Revise: Fundamental Rights (Part III) with an article-to-right map, the DPSP–FR relationship, and the five writ types under Articles 32 and 226.";
+}
+
 function buildPolity(phrase: string, q: string, exam: string): DoubtAnswer {
   const p = lowerFirst(phrase);
   return {
@@ -517,8 +549,7 @@ function buildPolity(phrase: string, q: string, exam: string): DoubtAnswer {
       `Mains pointer: Pair the provision with one current example or committee recommendation touching ${p}; a 2023–25 example converts a textbook answer into an analytical one.`,
       `Value addition: Close on the doctrine this question touches — federalism, basic structure or judicial review — that is the “so what” line markers look for.`,
     ],
-    concept:
-      "Revise: Fundamental Rights (Part III) with an article-to-right map, the DPSP–FR relationship, and the five writ types under Articles 32 and 226.",
+    concept: polityConceptRef(q),
   };
 }
 
